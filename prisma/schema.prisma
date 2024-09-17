@@ -11,28 +11,56 @@ datasource db {
 }
 
 model Products {
-  id    Int     @id @default(autoincrement())
-  name String  @unique
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
   description String
-  price  Float
-  stock Int
-  category String
+  price       Float
+  stock       Int
+  category    String
+
+  // Relación muchos a uno con carrito de compras
+  shoppingCar Shopping_car? @relation(fields: [shoppingCarId], references: [id])
+  shoppingCarId Int?
+
+  // Relación muchos a uno con Orders
+  orders      Orders?  @relation(fields: [orderId], references: [id])
+  orderId     Int?
 }
 
 model Payments {
-  id    Int     @id @default(autoincrement())
-  amount  Float
-  method  String
-  date DateTime
+  id       Int      @id @default(autoincrement())
+  amount   Float
+  method   String
+  date     DateTime
+
+  // Relación uno a uno con Orders
+  order    Orders?  @relation(fields: [orderId], references: [id])
+  orderId  Int?     @unique
 }
 
 model Orders {
-  id  Int @id @default(autoincrement())
-  total Float
-  orderDate DateTime
+  id         Int      @id @default(autoincrement())
+  total      Float
+  orderDate  DateTime
+
+  // Relación muchos a uno con Products
+  products   Products[]  
+
+  // Relación uno a uno con Payments
+  payments   Payments?  
+
+  // Relación muchos a uno con carrito de compras
+  shoppingCar Shopping_car? @relation(fields: [shoppingCarId], references: [id])
+  shoppingCarId Int?
 }
 
 model Shopping_car {
-  id  Int @id @default(autoincrement())
-  total  Float
+  id        Int       @id @default(autoincrement())
+  total     Float
+
+  // Relación muchos a uno con Products
+  products  Products[]  
+
+  // Relación muchos a uno con Orders
+  orders    Orders[]   
 }
