@@ -17,18 +17,14 @@ model Products {
   price  Float
   stock Int
   category String
-
+  posts Post[]
 }
 
-model Orders{
-  id Int @id @default(autoincrement())
-  total Float
-  orderDate DateTime
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean @default(false)
+  author    Products    @relation(fields: [authorId], references: [id])
+  authorId  Int
 }
-
-model Shopping_car{
-  id Int @id @default(autoincrement())
-  total Float
-}
-
-
