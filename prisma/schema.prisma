@@ -25,3 +25,14 @@ model Payments {
   method  String
   date DateTime
 }
+
+model Orders {
+  id  Int @id @default(autoincrement())
+  total Float
+  orderDate DateTime
+}
+
+model Shopping_car {
+  id  Int @id @default(autoincrement())
+  total  Float
+}
