@@ -6,9 +6,8 @@
 *Este archivo define los controladores de pagos
 */
 const {response,request} = require ('express')
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../../prisma/prismaClient.js');
 
-const prisma = new PrismaClient();
 
 const ProcessPayments = async(req=request, res=response)=>{
 

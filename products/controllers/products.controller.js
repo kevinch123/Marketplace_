@@ -6,6 +6,8 @@
 *Este archivo define los controladores de productos
 */
 const {response,request} = require ('express')
+const prisma = require('../../prisma/prismaClient.js');
+
 
 const AddProduct = async(req=request, res=response)=>{
 

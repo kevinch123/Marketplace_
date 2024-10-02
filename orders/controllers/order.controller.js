@@ -1,108 +1,118 @@
 /** 
-*@author kevin
-*@version 1.0.0
-*
-*Controlador de pedidos
-*Este archivo define los controladores de pedidos
-*/
+ * @author Kevin
+ * @version 1.0.0
+ *
+ * Controlador de pedidos
+ * Este archivo define los controladores de pedidos
+ */
 
 const { response, request } = require('express');
-const prisma = require ('../../prisma/prismaClient.js')
+const prisma = require('../../prisma/prismaClient.js');
 
 // Mostrar todas las órdenes
-const ShowOrders = async(req = request, res = response) => {
-    const orders = await prisma.orders.findMany()
-    .catch(err => {
-        return err.message;
-    }).finally(async () => {
+const ShowOrders = async (req = request, res = response) => {
+    try {
+        const orders = await prisma.orders.findMany();
+        res.json({
+            orders
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener órdenes', error: error.message });
+    } finally {
         await prisma.$disconnect();
-    });
-
-    res.json({
-        orders
-    });
+    }
 };
 
 // Agregar una nueva orden
-const AddOrders = async(req = request, res = response) => {
+const AddOrders = async (req = request, res = response) => {
     const { total, orderDate } = req.body;
-
-    const result = await prisma.orders.create({
-        data: {
-            total,
-            orderDate: new Date(orderDate)
-        }
-    }).catch(err => {
-        return err.message;
-    }).finally(async () => {
+    try {
+        const result = await prisma.orders.create({
+            data: {
+                total,
+                orderDate: new Date(orderDate) // Conversión de cadena a objeto Date
+            }
+        });
+        res.json({
+            result
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al agregar orden', error: error.message });
+    } finally {
         await prisma.$disconnect();
-    });
-
-    res.json({
-        result
-    });
+    }
 };
 
 // Mostrar una orden específica por ID
-const ShowOrder = async(req = request, res = response) => {
+const ShowOrder = async (req = request, res = response) => {
     const { id } = req.params;
+    try {
+        const result = await prisma.orders.findUnique({
+            where: {
+                id: Number(id)  // Aseguramos que sea un número
+            }
+        });
 
-    const result = await prisma.orders.findUnique({
-        where: {
-            id: Number(id)
+        if (!result) {
+            return res.status(404).json({ message: 'Orden no encontrada' });
         }
-    }).catch(err => {
-        return err.message;
-    }).finally(async () => {
-        await prisma.$disconnect();
-    });
 
-    res.json({
-        result
-    });
+        res.json({
+            result
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener la orden', error: error.message });
+    } finally {
+        await prisma.$disconnect();
+    }
 };
 
 // Editar una orden por ID
-const EditOrders = async(req = request, res = response) => {
+const EditOrders = async (req = request, res = response) => {
     const { id } = req.params;
     const { total, orderDate } = req.body;
-
-    const result = await prisma.orders.update({
-        where: {
-            id: Number(id)
-        },
-        data: {
-            total,
-            orderDate: new Date(orderDate)
-        }
-    }).catch(err => {
-        return err.message;
-    }).finally(async () => {
+    try {
+        const result = await prisma.orders.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                total,
+                orderDate: new Date(orderDate)
+            }
+        });
+        res.json({
+            result
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al editar la orden', error: error.message });
+    } finally {
         await prisma.$disconnect();
-    });
-
-    res.json({
-        result
-    });
+    }
 };
 
 // Eliminar una orden por ID
-const DeleteOrders = async(req = request, res = response) => {
+const DeleteOrders = async (req = request, res = response) => {
     const { id } = req.params;
-
-    const result = await prisma.orders.delete({
-        where: {
-            id: Number(id)
-        }
-    }).catch(err => {
-        return err.message;
-    }).finally(async () => {
+    try {
+        const result = await prisma.orders.delete({
+            where: {
+                id: Number(id)  // Aseguramos que sea un número
+            }
+        });
+        res.json({
+            result
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al eliminar la orden', error: error.message });
+    } finally {
         await prisma.$disconnect();
-    });
-
-    res.json({
-        result
-    });
+    }
 };
 
 module.exports = {

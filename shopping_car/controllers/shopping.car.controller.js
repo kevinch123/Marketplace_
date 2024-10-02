@@ -7,9 +7,8 @@
  */
 
 const { response, request } = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../../prisma/prismaClient.js');
 
-const prisma = new PrismaClient();
 
 const ShowShoppingCar = async (req = request, res = response) => {
     const { id } = req.params;
