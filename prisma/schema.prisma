@@ -11,12 +11,12 @@ datasource db {
 }
 
 model Products {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int     @id @default(autoincrement())
+  name        String
   description String
   price       Float
-  stock       Int
   category    String
+  stock       Int?    // Cambiado a opcional
 
   // Relación muchos a uno con carrito de compras
   shoppingCar Shopping_car? @relation(fields: [shoppingCarId], references: [id])

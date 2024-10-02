@@ -7,7 +7,7 @@
 */
 
 const { response, request } = require('express');
-const prisma = require ('../../prisma/prismaClient.js')
+const prisma = require ('../../prisma/prismaClient')
 
 // Mostrar todas las órdenes
 const ShowOrders = async(req = request, res = response) => {

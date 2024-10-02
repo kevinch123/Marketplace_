@@ -19,10 +19,11 @@ const {AddProduct,UpdateProduct,DeleteProduct,GetProduct} = require('../controll
  * GetProduct
  */
 
-router.post('/',AddProduct);
+router.post('/add',AddProduct);
 router.put('/:id',UpdateProduct);
 router.delete('/:id',DeleteProduct);
-router.get('/:id',GetProduct);
+router.get('/', GetProduct);
+
 
 
 module.exports = router;

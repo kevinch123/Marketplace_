@@ -6,15 +6,13 @@
 *Este archivo define los controladores de pagos
 */
 const {response,request} = require ('express')
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const prisma = require ('../../prisma/prismaClient')
 
 const ProcessPayments = async(req=request, res=response)=>{
 
     const { amount, method, date } = req.body;
 
-    const result = await prisma.users.create({
+    const result = await prisma.payments.create({
         data: {
             amount,
             method,
@@ -36,7 +34,7 @@ const ReturnPayment = async(req=request, res=response)=>{
 
     const { amount, method, date } = req.body;
 
-    const result = await prisma.users.create({
+    const result = await prisma.payments.create({
         data: {
             amount,
             method,

@@ -6,21 +6,26 @@
 *Este archivo define los controladores de productos
 */
 const {response,request} = require ('express')
+const prisma = require ('../../prisma/prismaClient')
 
 const AddProduct = async(req=request, res=response)=>{
 
 
-    const { name, description, price, category } = req.body;
+    const { name, description, price, category, stock } = req.body;
 
-    const result = await prisma.users.create({
+    const result = await prisma.products.create({
         data: {
             name,
             description,
             price,
-            category
+            category,
+            stock
         }
     }).catch(err=>{
-        return err.message;
+        res.status(500).json({
+            error: 'Failed to create product',
+            details: err.message
+        });
     }).finally((async ()=>{
         await prisma.$disconnect();
     }));
@@ -31,31 +36,48 @@ const AddProduct = async(req=request, res=response)=>{
 
 };
 
-const UpdateProduct = async(req=request, res=response)=>{
-    const { name, description, price, category } = req.body;
+const UpdateProduct = async (req = request, res = response) => {
+    const { id } = req.params; // Asegúrate de que el ID del producto se pase como parámetro en la URL
+    const { name, description, price, category, stock } = req.body;
 
-    const result = await prisma.users.create({
-        data: {
-            name,
-            description,
-            price,
-            category
+    try {
+        // Validar que se haya proporcionado el ID
+        if (!id) {
+            return res.status(400).json({
+                error: 'Product ID is required'
+            });
         }
-    }).catch(err=>{
-        return err.message;
-    }).finally((async ()=>{
-        await prisma.$disconnect();
-    }));
 
-    res.json({
-        result
-    });
+        // Actualizar el producto
+        const result = await prisma.products.update({
+            where: { id: parseInt(id) }, // Buscar el producto por ID
+            data: {
+                name,
+                description,
+                price: parseFloat(price),
+                category,
+                stock: parseInt(stock)
+            }
+        });
+
+        return res.status(200).json({
+            message: 'Product updated successfully',
+            product: result
+        });
+    } catch (err) {
+        return res.status(500).json({
+            error: 'Failed to update product',
+            details: err.message
+        });
+    } finally {
+        await prisma.$disconnect();
+    }
 };
 
 const DeleteProduct = async(req=request, res=response)=>{
     const { id } = req.params;
 
-    const result = await prisma.users.delete({
+    const result = await prisma.products.delete({
         where:{
             id: Number(id)
         }
