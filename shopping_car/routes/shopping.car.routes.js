@@ -4,20 +4,17 @@
  * cart routes
  * this file difines cart routes
  */
-const { Router } = require('express')
-const router =Router();
-//import from methods
-const{AddProduct,DeleteProducts,CalculateTotal,CheckOut} = require('../controllers/shopping.car.controller');
+const { Router } = require('express');
+const router = Router();
 
-//Routes
+// Importar los controladores correctamente
+const { AddProduct, DeleteProduct, ShowShoppingCar } = require('../controllers/shopping.car.controller');
 
-
-router.post('/',AddProduct);
-router.delete('/',DeleteProducts);
-router.get('/',CalculateTotal);
-router.get('/',CheckOut);
-
-
+// Rutas
+router.get('/:id', ShowShoppingCar);
+router.post('/', AddProduct);
+router.delete('/', DeleteProduct);
 
 
 module.exports = router;
+

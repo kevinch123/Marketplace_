@@ -18,13 +18,12 @@ model Products {
   category    String
   stock       Int?    // Cambiado a opcional
 
-  // Relación muchos a uno con carrito de compras
-  shoppingCar Shopping_car? @relation(fields: [shoppingCarId], references: [id])
+  // Relación muchos a uno con Shopping_car
+  shoppingCar  Shopping_car?   @relation(fields: [shoppingCarId], references: [id])
   shoppingCarId Int?
 
-  // Relación muchos a uno con Orders
-  orders      Orders?  @relation(fields: [orderId], references: [id])
-  orderId     Int?
+  // Relación muchos a muchos con Orders (a través de una tabla intermedia)
+  orders      OrdersProducts[]
 }
 
 model Payments {
@@ -43,24 +42,31 @@ model Orders {
   total      Float
   orderDate  DateTime
 
-  // Relación muchos a uno con Products
-  products   Products[]  
+  // Relación muchos a muchos con Products
+  products   OrdersProducts[]  
 
   // Relación uno a uno con Payments
   payment   Payments?
 
-  // Relación muchos a uno con carrito de compras
+  // Relación muchos a uno con Shopping_car
   shoppingCar Shopping_car? @relation(fields: [shoppingCarId], references: [id])
   shoppingCarId Int?
+}
+
+model OrdersProducts {
+  productId Int
+  orderId   Int
+  product   Products @relation(fields: [productId], references: [id])
+  order     Orders   @relation(fields: [orderId], references: [id])
+
+  @@id([productId, orderId]) // Define la clave primaria compuesta
 }
 
 model Shopping_car {
   id        Int       @id @default(autoincrement())
   total     Float
 
-  // Relación muchos a uno con Products
-  products  Products[]  
-
-  // Relación muchos a uno con Orders
-  orders    Orders[]   
+  // Relación uno a muchos con Products
+  products  Products[] // Relación de muchos a uno
+  orders    Orders[]   // Relación uno a muchos con Orders
 }
