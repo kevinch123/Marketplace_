@@ -35,11 +35,10 @@ const AddProduct = async(req=request, res=response)=>{
 };
 
 const UpdateProduct = async (req = request, res = response) => {
-    const { id } = req.params; // Asegúrate de que el ID del producto se pase como parámetro en la URL
+    const { id } = req.params;
     const { name, description, price, category, stock } = req.body;
 
     try {
-        // Validar que se haya proporcionado el ID
         if (!id) {
             return res.status(400).json({
                 error: 'Product ID is required'
