@@ -7,7 +7,11 @@
  */
 
 const { response, request } = require('express');
+<<<<<<< HEAD
+const prisma = require ('../../prisma/prismaClient')
+=======
 const prisma = require('../../prisma/prismaClient.js');
+>>>>>>> 991890096a8735151738aee27547a498883be4a0
 
 const ShowOrders = async (req = request, res = response) => {
     try {
