@@ -5,50 +5,68 @@
 *Controlador de pagos
 *Este archivo define los controladores de pagos
 */
-const {response,request} = require ('express')
-const ProcessPayments = async(req=request, res=response)=>{
+const { response, request } = require('express');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-    const { amount, method, date } = req.body;
+const ProcessPayments = async (req = request, res = response) => {
+    try {
+        const { amount, method, date } = req.body;
 
-    const result = await prisma.payments.create({
-        data: {
-            amount,
-            method,
-            date
+        if (!amount || !method || !date) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing payment details',
+            });
         }
-    }).catch(err=>{
-        return err.message;
-    }).finally((async ()=>{
+
+        // Crear una nueva orden
+        const newOrder = await prisma.orders.create({
+            data: {
+                total: amount, // Puedes ajustar el total según corresponda
+                orderDate: new Date(),
+            },
+        });
+
+        // Crear el pago y asociarlo a la nueva orden
+        const result = await prisma.payments.create({
+            data: {
+                amount,
+                method,
+                date,
+                orderId: newOrder.id,  // Asignar el nuevo orderId al pago
+            },
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Payment processed successfully',
+            result,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    } finally {
         await prisma.$disconnect();
-    }));
-
-    res.json({
-        result
-    });
-
+    }
 };
 
-const ReturnPayment = async(req=request, res=response)=>{
-
-    const { amount, method, date } = req.body;
-
-    const result = await prisma.payments.create({
-        data: {
-            amount,
-            method,
-            date
-        }
-    }).catch(err=>{
+const ReturnPayment = async(req = request, res = response) => {
+    const payments = await prisma.payments.findMany()
+    .catch(err => {
         return err.message;
-    }).finally((async ()=>{
+    }).finally(async () => {
         await prisma.$disconnect();
-    }));
-
-    res.json({
-        result
     });
 
+    res.json({
+        payments
+    });
 };
+
+
 
 module.exports = {
     ProcessPayments,
