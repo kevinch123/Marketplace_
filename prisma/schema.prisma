@@ -61,6 +61,7 @@ model OrdersProducts {
   @@id([productId, orderId]) // Define la clave primaria compuesta
 }
 
+
 model Shopping_car {
   id        Int                  @id @default(autoincrement())
   total     Float
