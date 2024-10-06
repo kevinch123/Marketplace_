@@ -7,13 +7,17 @@
 */
 const { response, request } = require('express');
 const { PrismaClient } = require('@prisma/client');
+const { Encrypt, Decrypt } = require('../middlewares/validate');
 const prisma = new PrismaClient();
 
 const ProcessPayments = async (req = request, res = response) => {
     try {
-        const { amount, method, date } = req.body;
+        let { amount, method, date } = req.body;
 
-        if (!amount || !method || !date) {
+        // Encriptar el método de pago
+        const encryptedMethod = Encrypt(method);
+
+        if (!amount || !encryptedMethod || !date) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing payment details',
@@ -23,7 +27,7 @@ const ProcessPayments = async (req = request, res = response) => {
         // Crear una nueva orden
         const newOrder = await prisma.orders.create({
             data: {
-                total: amount, // Puedes ajustar el total según corresponda
+                total: amount,
                 orderDate: new Date(),
             },
         });
@@ -32,16 +36,22 @@ const ProcessPayments = async (req = request, res = response) => {
         const result = await prisma.payments.create({
             data: {
                 amount,
-                method,
-                date,
-                orderId: newOrder.id,  // Asignar el nuevo orderId al pago
+                method: encryptedMethod, 
+                date, 
+                orderId: newOrder.id,  
             },
         });
 
         res.status(201).json({
             success: true,
             message: 'Payment processed successfully',
-            result,
+            result: {
+                id: result.id,
+                amount: result.amount,  
+                method: result.method, 
+                date: result.date,      
+                orderId: result.orderId,
+            },
         });
     } catch (err) {
         res.status(500).json({
@@ -53,19 +63,38 @@ const ProcessPayments = async (req = request, res = response) => {
     }
 };
 
-const ReturnPayment = async(req = request, res = response) => {
-    const payments = await prisma.payments.findMany()
-    .catch(err => {
-        return err.message;
-    }).finally(async () => {
+// Este controlador ahora desencripta el método de pago al devolverlo
+const ReturnPayment = async (req = request, res = response) => {
+    try {
+        const payments = await prisma.payments.findMany();
+        
+        const decryptedPayments = payments.map(payment => {
+            try {
+                return {
+                    ...payment,
+                    method: Decrypt(payment.method), 
+                };
+            } catch (error) {
+                return {
+                    ...payment,
+                    method: "Unable to decrypt",
+                };
+            }
+        });
+
+        res.json({
+            success: true,
+            payments: decryptedPayments,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    } finally {
         await prisma.$disconnect();
-    });
-
-    res.json({
-        payments
-    });
+    }
 };
-
 
 
 module.exports = {
