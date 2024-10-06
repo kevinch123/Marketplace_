@@ -14,6 +14,7 @@ const ProcessPayments = async (req = request, res = response) => {
     try {
         let { amount, method, date } = req.body;
 
+        // Encriptar el método de pago
         const encryptedMethod = Encrypt(method);
 
         if (!amount || !encryptedMethod || !date) {
@@ -34,7 +35,7 @@ const ProcessPayments = async (req = request, res = response) => {
         // Crear el pago y asociarlo a la nueva orden
         const result = await prisma.payments.create({
             data: {
-                amount,   
+                amount,
                 method: encryptedMethod, 
                 date, 
                 orderId: newOrder.id,  
@@ -47,7 +48,7 @@ const ProcessPayments = async (req = request, res = response) => {
             result: {
                 id: result.id,
                 amount: result.amount,  
-                method: result.method,  
+                method: result.method, 
                 date: result.date,      
                 orderId: result.orderId,
             },
@@ -62,18 +63,39 @@ const ProcessPayments = async (req = request, res = response) => {
     }
 };
 
+// Este controlador ahora desencripta el método de pago al devolverlo
 const ReturnPayment = async (req = request, res = response) => {
-    const payments = await prisma.payments.findMany()
-        .catch(err => {
-            return err.message;
-        }).finally(async () => {
-            await prisma.$disconnect();
+    try {
+        const payments = await prisma.payments.findMany();
+        
+        const decryptedPayments = payments.map(payment => {
+            try {
+                return {
+                    ...payment,
+                    method: Decrypt(payment.method), 
+                };
+            } catch (error) {
+                return {
+                    ...payment,
+                    method: "Unable to decrypt",
+                };
+            }
         });
 
-    res.json({
-        payments
-    });
+        res.json({
+            success: true,
+            payments: decryptedPayments,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    } finally {
+        await prisma.$disconnect();
+    }
 };
+
 
 module.exports = {
     ProcessPayments,
