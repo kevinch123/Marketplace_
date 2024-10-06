@@ -20,15 +20,15 @@ RUN npm install prisma -g \
 
 RUN mkdir -p /usr/shoppingCarAPI
 
-WORKDIR /usr/shoppingCarApi
+WORKDIR /usr/shoppingCarAPI
 
-COPY orders/package*.json /usr/shoppingCarApi/
+COPY shopping_car/package*.json /usr/shoppingCarAPI/
 
 RUN npm install
 
 RUN npm install dotenv --save-dev
 
-COPY orders /usr/shoppingCarApi/
+COPY orders /usr/shoppingCarAPI/
 
 RUN prisma generate
 

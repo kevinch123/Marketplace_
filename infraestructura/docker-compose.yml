@@ -1,12 +1,9 @@
-version: "3.8"
-
 services:
-  
   orders_api:
     build:
       context: ./APIS/orders
     ports:
-      - "3000:3000"
+      - "3001:3000"  # Cambié el puerto para evitar colisión
     volumes:
       - ./APIS/orders:/usr/orderAPI
       - ./infraestructura/prisma:/usr/infraestructura/prisma
@@ -15,25 +12,25 @@ services:
     build:
       context: ./APIS/payments
     ports:
-      - "3000:3000"
+      - "3002:3000"  # Cambié el puerto para evitar colisión
     volumes:
-      - ./APIS/payments:/usr/paimentAPI
+      - ./APIS/payments:/usr/paymentAPI  # Corregí el nombre
       - ./infraestructura/prisma:/usr/infraestructura/prisma
 
   products_api:
     build:
       context: ./APIS/products
     ports:
-      - "3000:3000"
+      - "3003:3000"  # Cambié el puerto para evitar colisión
     volumes:
       - ./APIS/products:/usr/productAPI
       - ./infraestructura/prisma:/usr/infraestructura/prisma
 
-  shopingCar_api:
+  shoppingcar_api:  # Cambié el nombre a minúsculas
     build:
-      context: ./APIS/shoping_car
+      context: ./APIS/shopping_car
     ports:
-      - "3000:3000"
+      - "3004:3000"  # Cambié el puerto para evitar colisión
     volumes:
-      - ./APIS/shoping_car:/usr/shoppingCarApi
+      - ./APIS/shopping_car:/usr/shoppingCarAPI  # Corregí el nombre
       - ./infraestructura/prisma:/usr/infraestructura/prisma

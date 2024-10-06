@@ -20,15 +20,15 @@ RUN npm install prisma -g \
 
 RUN mkdir -p /usr/orderAPI
 
-WORKDIR /usr/orderApi
+WORKDIR /usr/orderAPI
 
-COPY orders/package*.json /usr/orderApi/
+COPY orders/package*.json /usr/orderAPI/
 
 RUN npm install
 
 RUN npm install dotenv --save-dev
 
-COPY orders /usr/orderApi/
+COPY orders /usr/orderAPI/
 
 RUN prisma generate
 

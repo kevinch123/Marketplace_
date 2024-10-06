@@ -18,17 +18,17 @@ RUN npm install prisma -g \
     && npm install nodemon -g \
     && npm install @prisma/client -g
 
-RUN mkdir -p /usr/productsAPI
+RUN mkdir -p /usr/productAPI
 
-WORKDIR /usr/productsAPI
+WORKDIR /usr/productAPI
 
-COPY orders/package*.json /usr/productsAPI/
+COPY products/package*.json /usr/productAPI/
 
 RUN npm install
 
 RUN npm install dotenv --save-dev
 
-COPY orders /usr/productsAPI/
+COPY orders /usr/productAPI/
 
 RUN prisma generate
 
